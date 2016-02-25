@@ -9,7 +9,24 @@ use Furl;
 use Moo;
 use URI;
 
-use Google::OAuth2::Token;
+=head1 NAME
+
+Google::OAuth2::Client::Simple
+
+=head2 DESCRIPTION
+
+A client library that talks to Googles OAuth 2.0 API, found at:
+https://developers.google.com/identity/protocols/OAuth2WebServer
+
+Provides methods to cover the whole oauth flow to get an access token
+and connect to the Googe API.
+
+=head2 NOTE
+
+Token storage should be something handled by your application,
+if persistent usage is a requirement.
+
+=cut
 
 has client_id => ( is => 'ro', required => 1 );
 has client_secret => ( is => 'ro', required => 1 );
@@ -27,6 +44,11 @@ has auth_uri => (
 has token_uri => (
     is => 'ro',
     default => sub { return 'https://www.googleapis.com/oauth2/v4/token' }
+);
+
+has revoke_uri => (
+    is => 'ro',
+    default => sub { return 'https://accounts.google.com/o/oauth2/revoke' }
 );
 
 has scopes => (
@@ -60,6 +82,32 @@ has ua => (
     },
 );
 
+=head2 request_user_consent
+
+Returns a Furl::Response, the contents of which will contain Googles
+sign in form. Once the user signs in they will be shown a list of
+scopes your application is requesting, and will either allow or
+deny you permission.
+
+This method should be called to start the oauth flow, meaning
+before trying to exchange the code for an access token.
+
+Once the user gives consent successfully, they will be redirected to
+$self->redirect_uri which will contain 'code' and 'state' params.
+The 'code' is used to exchange it for an access token.
+
+USAGE:
+
+my $response = $self->request_user_consent();
+
+# in CGI file?
+print $response->content();
+
+# in an App?
+return $self->render( html => $response->content() );
+
+=cut
+
 sub request_user_consent {
     my ($self) = @_;
 
@@ -86,6 +134,28 @@ sub request_user_consent {
 
     return $response;
 }
+
+=head2 exchange_code_for_token
+
+Returns a I<HashRef> of token data which looks like:
+
+{
+  "access_token":"1/fFAGRNJru1FTz70BzhT3Zg",
+  "expires_in":3920,
+  "token_type":"Bearer",
+  "refresh_token":"XXXXXXXX"
+}
+
+This method should be called once you successfully retrieved a 'code'
+from request_user_consent() to end the oauth process by getting
+an access_token.
+
+'refresh_token' is only returned from Google if the access_type
+was 'offline' when requesting user consent. It should be saved
+in long term storage as stated in the documentation for you
+to be able to refresh access tokens for persistent usage.
+
+=cut
 
 sub exchange_code_for_token {
     my ($self, $code, $state) = @_;
@@ -121,10 +191,72 @@ sub exchange_code_for_token {
     return JSON::from_json($response->content());
 }
 
-sub get_token {
-    my ($self, $key) = @_;
+=head2 refresh_token
+
+For use when you require offline access.
+
+Returns a I<HashRef> of token data similar to requesting an access token.
+
+Assuming you are storing the access token in your own storage method,
+the access token returned here should replace the old one stored
+against the user.
+
+=cut
+
+sub refresh_token {
+    my ($self, $refresh_token) = @_;
 
     return unless $self->access_type eq 'offline';
+
+    unless ( $refresh_token ) {
+        Carp::confess("Refresh token was not given");
+    }
+
+    my %params = (
+        grant_type      => 'refresh_token',
+        refresh_token   => $refresh_token,
+        client_id       => $self->client_id,
+        client_secret   => $self->client_secret,
+    );
+
+    my $response = $self->ua->post(
+        $self->token_uri,
+        ['Content-Type', 'application/x-www-form-urlencoded'],
+        \%params
+    );
+
+    if ( !$response->is_success() ) {
+        Carp::confess("Failed to refresh token, received this content: " . $response->content());
+    }
+
+    return JSON::from_json($response->content());
+}
+
+=head2 revoke_token
+
+Revokes the access token on Google on behalf of the user.
+
+If successful, it will be as if the user had never given
+consent to your application, so restarting the oauth flow
+will be the next step.
+
+=cut
+
+sub revoke_token {
+    my ($self, $access_token) = @_;
+
+    return unless $access_token;
+
+    my $uri = URI->new($self->revoke_uri);
+    $uri->query_form({ token => $access_token });
+
+    my $response = $self->ua->get($uri->as_string);
+
+    if ( !$response->is_success() ) {
+        Carp::confess("Revoking the access token failed, received this content: " . $response->content());
+    }
+
+    return 1;
 }
 
 1;

@@ -21,26 +21,14 @@ if ( !$app->access_token() ) {
 }
 
 # then in your 'redirect_uri' route:
-my $token_ref = $google_client->exchange_code_for_token($self->param('code'),[$self->param('state')]);
+my $token_ref = $google_client->exchange_code_for_token($self->param('code'), $self->param('state'));
 $app->access_token($token_ref->{access_token}); # set the access token in your app, it lasts for an hour
-
-------------------------------------------
-
-# If your 'access_type' is 'offline' and you need persistent usage, you can let the package handle refreshing the access token:
-my $token = $google_client->get_token($chi_key);
-unless ( $token ) {
-    $response = $google_client->request_user_consent();
-    # redirect somewhere to show the form
-}
-else {
-    return $token;
-}
 
 ```
 
 ## Description
 
-## Testing
+## CPANTester Notes
 
 There are two ways to test the library; running the test suite or running a PSGI app to go through the flow of authenticating.
 
