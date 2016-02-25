@@ -1,4 +1,4 @@
-package Google::OAuth::Client;
+package Google::OAuth2::Client;
 # ABSTRACT: OAuth lib for Google OAuth 2.0
 
 use strict;
