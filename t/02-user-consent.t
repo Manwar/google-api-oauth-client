@@ -3,18 +3,22 @@ use Test::Most;
 use Path::Tiny;
 use JSON;
 
-my $json = path('./t/config.json')->slurp;
-my $config = eval { JSON::from_json($json); };
-my $err = $@;
+my $conf_file = './t/config.json';
 
-if ( !$config || $err ) {
-    BAIL_OUT "A JSON config file is required to run these tests. You might have
-    some errors in it: $err";
+unless ( path($conf_file)->exists ) {
+    plan skip_all => "A JSON config file is required to run these tests. See docs for info on what's needed";
 }
 
-use Google::OAuth::Client;
+my $json = path($conf_file)->slurp;
+my $config = eval { JSON::from_json($json); };
 
-ok my $google = Google::OAuth::Client->new(
+if ( my $err = $@ ) {
+    plan skip_all => "There were errors in your JSON config file: $err";
+}
+
+use Google::OAuth2::Client;
+
+ok my $google = Google::OAuth2::Client->new(
     client_id => $config->{client_id},
     client_secret => $config->{client_secret},
     redirect_uri => $config->{redirect_uri},
