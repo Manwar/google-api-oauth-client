@@ -3,9 +3,9 @@
 ## Synopsis
 
 ```
-use Google::OAuth2::Client::Simple;
-
 # Basic usage
+
+use Google::OAuth2::Client::Simple;
 
 my $google_client = Google::OAuth2::Client::Simple->new(
     client_id => $config->{client_id},
@@ -20,9 +20,11 @@ if ( !$app->access_token() ) {
     $response->content(); #show Googles html form to the user
 }
 
-# in your 'redirect_uri' route:
+# then in your 'redirect_uri' route:
 my $token_ref = $google_client->exchange_code_for_token($self->param('code'),[$self->param('state')]);
 $app->access_token($token_ref->{access_token}); # set the access token in your app, it lasts for an hour
+
+------------------------------------------
 
 # If your 'access_type' is 'offline', you can let the package handle refreshing the access token:
 my $token = $google_client->get_token($chi_key);
