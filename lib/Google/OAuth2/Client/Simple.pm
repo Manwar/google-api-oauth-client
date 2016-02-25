@@ -129,7 +129,7 @@ sub request_user_consent {
     my $response = $self->ua->get($uri->as_string);
 
     if ( !$response->is_success() ) {
-        Carp::confess("Requesting user consent failed, received this content: " . $response->content());
+        Carp::confess("Requesting user consent failed, response was:\n" . $response->as_string());
     }
 
     return $response;
@@ -185,10 +185,10 @@ sub exchange_code_for_token {
     );
 
     if ( !$response->is_success() ) {
-        Carp::confess("Error exchanging code for bearer token, received this content: " . $response->content());
+        Carp::confess("Error exchanging code for bearer token, response was:\n" . $response->as_string());
     }
 
-    return JSON::from_json($response->content());
+    return JSON::from_json($response->decoded_content());
 }
 
 =head2 refresh_token
@@ -226,10 +226,10 @@ sub refresh_token {
     );
 
     if ( !$response->is_success() ) {
-        Carp::confess("Failed to refresh token, received this content: " . $response->content());
+        Carp::confess("Failed to refresh token, response was:\n" . $response->as_string());
     }
 
-    return JSON::from_json($response->content());
+    return JSON::from_json($response->decoded_content());
 }
 
 =head2 revoke_token
@@ -253,7 +253,7 @@ sub revoke_token {
     my $response = $self->ua->get($uri->as_string);
 
     if ( !$response->is_success() ) {
-        Carp::confess("Revoking the access token failed, received this content: " . $response->content());
+        Carp::confess("Revoking the access token failed, response was:\n" . $response->as_string());
     }
 
     return 1;
