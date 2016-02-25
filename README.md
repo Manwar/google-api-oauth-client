@@ -1,4 +1,4 @@
-# Google API OAuth 2.0 Client library for Perl
+# A Google API OAuth 2.0 Client library for Perl
 
 ## Synopsis
 
@@ -27,6 +27,12 @@ $app->access_token($token_ref->{access_token}); # set the access token in your a
 ```
 
 ## Description
+
+A client library that talks to Googles OAuth 2.0 API, found at:
+https://developers.google.com/identity/protocols/OAuth2WebServer
+
+Provides methods to cover the whole OAuth flow to get an access token and connect to the Google API.
+Token storage should be something handled by your application, if persistent usage is a requirement.
 
 ## CPANTester Notes
 

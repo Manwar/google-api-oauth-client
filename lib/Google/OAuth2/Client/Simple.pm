@@ -19,7 +19,7 @@ A client library that talks to Googles OAuth 2.0 API, found at:
 https://developers.google.com/identity/protocols/OAuth2WebServer
 
 Provides methods to cover the whole oauth flow to get an access token
-and connect to the Googe API.
+and connect to the Google API.
 
 =head2 NOTE
 
