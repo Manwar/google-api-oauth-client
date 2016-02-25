@@ -16,9 +16,9 @@ if ( my $err = $@ ) {
     plan skip_all => "There were errors in your JSON config file: $err";
 }
 
-use Google::OAuth2::Client;
+use Google::OAuth2::Client::Simple;
 
-ok my $google = Google::OAuth2::Client->new(
+ok my $google = Google::OAuth2::Client::Simple->new(
     client_id => $config->{client_id},
     client_secret => $config->{client_secret},
     redirect_uri => $config->{redirect_uri},
