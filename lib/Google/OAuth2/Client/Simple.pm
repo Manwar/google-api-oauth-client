@@ -9,6 +9,8 @@ use Furl;
 use Moo;
 use URI;
 
+use Google::OAuth2::Token;
+
 has client_id => ( is => 'ro', required => 1 );
 has client_secret => ( is => 'ro', required => 1 );
 has redirect_uri => ( is => 'ro', required => 1 );
@@ -116,7 +118,13 @@ sub exchange_code_for_token {
         Carp::confess("Error exchanging code for bearer token, received this content: " . $response->content());
     }
 
-    return $response;
+    return JSON::from_json($response->content());
+}
+
+sub get_token {
+    my ($self, $key) = @_;
+
+    return unless $self->access_type eq 'offline';
 }
 
 1;

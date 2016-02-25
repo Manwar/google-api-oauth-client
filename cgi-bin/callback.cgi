@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use CGI;
+use Data::Dumper;
 
 use Path::Tiny;
 use JSON;
@@ -24,6 +25,6 @@ my $cgi = CGI->new();
 
 print $cgi->header('text/html');
 
-my $response = $client->exchange_code_for_token($cgi->param('code'), $cgi->param('state'));
+my $token_ref = $client->exchange_code_for_token($cgi->param('code'), $cgi->param('state'));
 
-print $response->{content};
+print Dumper($token_ref);
