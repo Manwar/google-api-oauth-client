@@ -26,7 +26,7 @@ $app->access_token($token_ref->{access_token}); # set the access token in your a
 
 ------------------------------------------
 
-# If your 'access_type' is 'offline', you can let the package handle refreshing the access token:
+# If your 'access_type' is 'offline' and you need persistent usage, you can let the package handle refreshing the access token:
 my $token = $google_client->get_token($chi_key);
 unless ( $token ) {
     $response = $google_client->request_user_consent();
