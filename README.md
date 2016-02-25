@@ -32,7 +32,9 @@ A client library that talks to Googles OAuth 2.0 API, found at:
 https://developers.google.com/identity/protocols/OAuth2WebServer
 
 Provides methods to cover the whole OAuth flow to get an access token and connect to the Google API.
-Token storage should be something handled by your application, if persistent usage is a requirement.
+
+It should be noted that token storage should be something handled by your application, if persistent usage is a requirement.
+This client library doesn't do that because, well, it's simple ;)
 
 ## CPANTester Notes
 
