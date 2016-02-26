@@ -9,7 +9,7 @@ use Data::Dumper;
 use Path::Tiny;
 use JSON;
 
-my $json = path('../t/config.json')->slurp;
+my $json = path('../config.json')->slurp;
 my $config = JSON::from_json($json);
 
 use Google::OAuth2::Client::Simple;

@@ -126,11 +126,10 @@ sub request_user_consent {
     my $uri = URI->new($self->auth_uri);
     $uri->query_form(\%params);
 
-    my $response = $self->ua->get($uri->as_string);
-
-    if ( !$response->is_success() ) {
-        Carp::confess("Requesting user consent failed, response was:\n" . $response->as_string());
-    }
+    my $response = $self->_request(
+        method => 'GET',
+        url => $uri->as_string
+    );
 
     return $response;
 }
@@ -150,9 +149,9 @@ This method should be called once you successfully retrieved a 'code'
 from request_user_consent() to end the oauth process by getting
 an access_token.
 
-'refresh_token' is only returned from Google if the access_type
-was 'offline' when requesting user consent. It should be saved
-in long term storage as stated in the documentation for you
+'refresh_token' is only returned from Google if the access_type was 'offline' when
+requesting user consent and it was the first time the access token was received.
+It should be saved in long term storage as stated in the documentation for you
 to be able to refresh access tokens for persistent usage.
 
 =cut
@@ -178,15 +177,12 @@ sub exchange_code_for_token {
         redirect_uri    => $self->redirect_uri,
     );
 
-    my $response = $self->ua->post(
-        $self->token_uri,
-        ['Content-Type', 'application/x-www-form-urlencoded'],
-        \%params
+    my $response = $self->_request(
+        method => 'POST',
+        url => $self->token_uri,
+        headers => ['Content-Type', 'application/x-www-form-urlencoded'],
+        content => \%params
     );
-
-    if ( !$response->is_success() ) {
-        Carp::confess("Error exchanging code for bearer token, response was:\n" . $response->as_string());
-    }
 
     return JSON::from_json($response->decoded_content());
 }
@@ -219,15 +215,12 @@ sub refresh_token {
         client_secret   => $self->client_secret,
     );
 
-    my $response = $self->ua->post(
-        $self->token_uri,
-        ['Content-Type', 'application/x-www-form-urlencoded'],
-        \%params
+    my $response = $self->_request(
+        method => 'POST',
+        url => $self->token_uri,
+        headers => ['Content-Type', 'application/x-www-form-urlencoded'],
+        content => \%params
     );
-
-    if ( !$response->is_success() ) {
-        Carp::confess("Failed to refresh token, response was:\n" . $response->as_string());
-    }
 
     return JSON::from_json($response->decoded_content());
 }
@@ -250,13 +243,24 @@ sub revoke_token {
     my $uri = URI->new($self->revoke_uri);
     $uri->query_form({ token => $access_token });
 
-    my $response = $self->ua->get($uri->as_string);
-
-    if ( !$response->is_success() ) {
-        Carp::confess("Revoking the access token failed, response was:\n" . $response->as_string());
-    }
+    $self->_request(
+        method => 'GET',
+        url => $uri->as_string
+    );
 
     return 1;
+}
+
+sub _request {
+    my ($self, %req) = @_;
+
+    my $response = $self->ua->request(%req);
+
+    if ( !$response->is_success() ) {
+        Carp::confess("Request to $req{url} failed, response was:\n" . $response->as_string());
+    }
+
+    return $response;
 }
 
 1;

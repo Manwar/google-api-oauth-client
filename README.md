@@ -36,23 +36,7 @@ Provides methods to cover the whole OAuth flow to get an access token and connec
 It should be noted that token storage should be something handled by your application, if persistent usage is a requirement.
 This client library doesn't do that because, well, it's simple ;)
 
-## CPANTester Notes
-
-There are two ways to test the library; running the test suite or running a PSGI app to go through the flow of authenticating.
-
-To run both, you'll need a `t/config.json` file that has your own app credentials.
-The following should be present in the JSON config:
-
-```
-{
-    "client_id": "xxxx",
-    "client_secret": "xxxx",
-    "redirect_uri": "xxxx",
-    "scopes": ['valid_scopes_from_url_below']
-}
-```
-
-To get these credentials, register your app by following the instructions under "Creating web application credentials":
+To get credentials, register your app by following the instructions under "Creating web application credentials":
 https://developers.google.com/identity/protocols/OAuth2WebServer
 
 Valid scopes can be found here:
