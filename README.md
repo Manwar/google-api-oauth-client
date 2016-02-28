@@ -55,15 +55,9 @@ Once the user gives consent successfully, they will be redirected to
 $self->redirect\_uri which will contain 'code' and 'state' params.
 The 'code' is used to exchange it for an access token.
 
-USAGE:
+For example, in a CGI file you can do something like: `print $response-`content();>
 
-    my $response = $self->request_user_consent();
-
-in CGI file? Can do something like:
-    print $response->content();
-
-Or in an application framework like Mojolicious:
-    return $self->render( html => $response->content() );
+Or in an application framework like Mojolicious: `return $self-`render( html => $response->content() );>
 
 ## $g\_oauth->exchange\_code\_for\_token($code)
 
