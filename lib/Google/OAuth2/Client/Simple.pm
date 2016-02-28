@@ -13,18 +13,44 @@ use URI;
 
 Google::OAuth2::Client::Simple
 
-=head2 DESCRIPTION
+=head1 SYNOPSIS
+
+    use Google::OAuth2::Client::Simple;
+
+    my $google_client = Google::OAuth2::Client::Simple->new(
+        client_id => $config->{client_id},
+        client_secret => $config->{client_secret},
+        redirect_uri => $config->{redirect_uri},
+        scopes => ['https://www.googleapis.com/auth/drive.readonly', '...'],
+    );
+
+    within some page that connects to googleapis:
+    if ( !$app->access_token() ) {
+        $response = $google_client->request_user_consent();
+        $response->content(); #show Googles html form to the user
+    }
+
+    then in your 'redirect_uri' route:
+    my $token_ref = $google_client->exchange_code_for_token($self->param('code'), $self->param('state'));
+    $app->access_token($token_ref->{access_token}); # set the access token in your app, it lasts for an hour
+
+=head1 DESCRIPTION
 
 A client library that talks to Googles OAuth 2.0 API, found at:
 https://developers.google.com/identity/protocols/OAuth2WebServer
 
-Provides methods to cover the whole oauth flow to get an access token
-and connect to the Google API.
+Provides methods to cover the whole OAuth flow to get an access token and connect to the Google API.
 
-=head2 NOTE
+To get credentials, register your app by following the instructions under "Creating web application credentials":
+https://developers.google.com/identity/protocols/OAuth2WebServer
 
-Token storage should be something handled by your application,
-if persistent usage is a requirement.
+Valid scopes can be found here:
+https://developers.google.com/identity/protocols/googlescopes
+
+=head1 NOTE
+
+It should be noted that token storage should be something handled by your application, if persistent usage is a requirement.
+This client library doesn't do that because, well, it's simple ;)
 
 =cut
 
@@ -82,7 +108,7 @@ has ua => (
     },
 );
 
-=head2 request_user_consent
+=head2 $g_oauth->request_user_consent
 
 Returns a Furl::Response, the contents of which will contain Googles
 sign in form. Once the user signs in they will be shown a list of
@@ -98,13 +124,13 @@ The 'code' is used to exchange it for an access token.
 
 USAGE:
 
-my $response = $self->request_user_consent();
+    my $response = $self->request_user_consent();
 
-# in CGI file?
-print $response->content();
+in CGI file? Can do something like:
+    print $response->content();
 
-# in an App?
-return $self->render( html => $response->content() );
+Or in an application framework like Mojolicious:
+    return $self->render( html => $response->content() );
 
 =cut
 
@@ -134,19 +160,19 @@ sub request_user_consent {
     return $response;
 }
 
-=head2 exchange_code_for_token
+=head2 $g_oauth->exchange_code_for_token($code)
 
 Returns a I<HashRef> of token data which looks like:
 
-{
-  "access_token":"1/fFAGRNJru1FTz70BzhT3Zg",
-  "expires_in":3920,
-  "token_type":"Bearer",
-  "refresh_token":"XXXXXXXX"
-}
+    {
+      "access_token":"1/fFAGRNJru1FTz70BzhT3Zg",
+      "expires_in":3920,
+      "token_type":"Bearer",
+      "refresh_token":"XXXXXXXX"
+    }
 
 This method should be called once you successfully retrieved a 'code'
-from request_user_consent() to end the oauth process by getting
+from request_user_consent(), to end the oauth process by getting
 an access_token.
 
 'refresh_token' is only returned from Google if the access_type was 'offline' when
@@ -187,7 +213,7 @@ sub exchange_code_for_token {
     return JSON::from_json($response->decoded_content());
 }
 
-=head2 refresh_token
+=head2 $g_oauth->refresh_token($access_token)
 
 For use when you require offline access.
 
@@ -225,13 +251,13 @@ sub refresh_token {
     return JSON::from_json($response->decoded_content());
 }
 
-=head2 revoke_token
+=head2 $g_oauth->revoke_token($access_token)
 
 Revokes the access token on Google on behalf of the user.
 
 If successful, it will be as if the user had never given
 consent to your application, so restarting the oauth flow
-will be the next step.
+will be the necessary.
 
 =cut
 
