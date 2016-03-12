@@ -3,7 +3,7 @@ use Test::Most;
 use Test::Mock::Furl;
 use Furl::Response;
 
-use JSON;
+use Cpanel::JSON::XS;
 
 use Google::OAuth2::Client::Simple;
 
@@ -15,12 +15,12 @@ my $content = {
 
 $Mock_furl->mock(
     request => sub {
-        return Furl::Response->new(1, 200, 'OK', {'content-type' => 'application/json'}, JSON::to_json($content));
+        return Furl::Response->new(1, 200, 'OK', {'content-type' => 'application/json'}, encode_json($content));
     }
 );
 
 $Mock_furl_res->mock(
-    decoded_content => sub { return JSON::to_json($content); }
+    decoded_content => sub { return encode_json($content); }
 );
 
 ok my $google = Google::OAuth2::Client::Simple->new(

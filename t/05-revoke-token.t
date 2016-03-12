@@ -3,8 +3,6 @@ use Test::Most;
 use Test::Mock::Furl;
 use Furl::Response;
 
-use JSON;
-
 use Google::OAuth2::Client::Simple;
 
 $Mock_furl->mock(

@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Carp;
+use Cpanel::JSON::XS;
 use Furl;
 use Moo;
 use URI;
@@ -204,7 +205,7 @@ sub exchange_code_for_token {
         content => \%params
     );
 
-    return JSON::from_json($response->decoded_content());
+    return decode_json($response->decoded_content());
 }
 
 =head2 $g_oauth->refresh_token($access_token)
@@ -242,7 +243,7 @@ sub refresh_token {
         content => \%params
     );
 
-    return JSON::from_json($response->decoded_content());
+    return decode_json($response->decoded_content());
 }
 
 =head2 $g_oauth->revoke_token($access_token)
