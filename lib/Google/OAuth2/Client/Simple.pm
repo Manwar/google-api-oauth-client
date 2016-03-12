@@ -1,9 +1,6 @@
 package Google::OAuth2::Client::Simple;
 # ABSTRACT: OAuth lib for Google OAuth 2.0
 
-use strict;
-use warnings;
-
 use Carp;
 use Cpanel::JSON::XS;
 use Furl;
@@ -12,7 +9,7 @@ use URI;
 
 =head1 NAME
 
-Google::OAuth2::Client::Simple
+Google::OAuth2::Client::Simple - Client for Google OAuth2.
 
 =head1 SYNOPSIS
 
