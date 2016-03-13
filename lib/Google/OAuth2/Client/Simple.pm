@@ -281,4 +281,20 @@ sub _request {
     return $response;
 }
 
+=head1 AUTHOR
+
+Ali Zia, C<< <ziali088@gmail.com> >>
+
+=head1 REPOSITORY
+
+https://github.com/ziali088/google-api-oauth-client
+
+=head1 COPYRIGHT AND LICENSE
+
+This is free software. You may use it and distribute it under the same terms as Perl itself.
+
+Copyright (C) 2016 - Ali Zia
+
+=cut
+
 1;
