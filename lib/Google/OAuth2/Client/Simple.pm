@@ -30,7 +30,7 @@ Google::OAuth2::Client::Simple - Client for Google OAuth2.
 
     then in your 'redirect_uri' route:
     my $token_ref = $google_client->exchange_code_for_token($self->param('code'), $self->param('state'));
-    $app->access_token($token_ref->{access_token}); # set the access token in your app, it lasts for an hour
+    $app->access_token($token_ref->{access_token}); # set the access token somewhere (maybe in cache?), it lasts for an hour
 
 =head1 DESCRIPTION
 
@@ -106,7 +106,7 @@ has ua => (
     },
 );
 
-=head2 $g_oauth->request_user_consent
+=head2 request_user_consent
 
 Returns a Furl::Response, the contents of which will contain Googles
 sign in form. Once the user signs in they will be shown a list of
@@ -152,7 +152,7 @@ sub request_user_consent {
     return $response;
 }
 
-=head2 $g_oauth->exchange_code_for_token($code)
+=head2 exchange_code_for_token($code)
 
 Returns a I<HashRef> of token data which looks like:
 
@@ -205,7 +205,7 @@ sub exchange_code_for_token {
     return decode_json($response->decoded_content());
 }
 
-=head2 $g_oauth->refresh_token($access_token)
+=head2 refresh_token($refresh_token)
 
 For use when you require offline access.
 
@@ -243,7 +243,7 @@ sub refresh_token {
     return decode_json($response->decoded_content());
 }
 
-=head2 $g_oauth->revoke_token($access_token)
+=head2 revoke_token($access_token)
 
 Revokes the access token on Google on behalf of the user.
 

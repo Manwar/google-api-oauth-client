@@ -1,6 +1,6 @@
 # NAME
 
-Google::OAuth2::Client::Simple
+Google::OAuth2::Client::Simple - Client for Google OAuth2.
 
 # SYNOPSIS
 
@@ -21,7 +21,7 @@ Google::OAuth2::Client::Simple
 
     then in your 'redirect_uri' route:
     my $token_ref = $google_client->exchange_code_for_token($self->param('code'), $self->param('state'));
-    $app->access_token($token_ref->{access_token}); # set the access token in your app, it lasts for an hour
+    $app->access_token($token_ref->{access_token}); # set the access token somewhere (maybe in cache?), it lasts for an hour
 
 # DESCRIPTION
 
@@ -41,7 +41,7 @@ https://developers.google.com/identity/protocols/googlescopes
 It should be noted that token storage should be something handled by your application, if persistent usage is a requirement.
 This client library doesn't do that because, well, it's simple ;)
 
-## $g\_oauth->request\_user\_consent
+## request\_user\_consent
 
 Returns a Furl::Response, the contents of which will contain Googles
 sign in form. Once the user signs in they will be shown a list of
@@ -59,7 +59,7 @@ For example, in a CGI file you can do something like: `print $response->content(
 
 Or in an application framework like Mojolicious: `return $self->render( html => $response->content() );`
 
-## $g\_oauth->exchange\_code\_for\_token($code)
+## exchange\_code\_for\_token($code)
 
 Returns a _HashRef_ of token data which looks like:
 
@@ -79,7 +79,7 @@ requesting user consent and it was the first time the access token was received.
 It should be saved in long term storage as stated in the documentation for you
 to be able to refresh access tokens for persistent usage.
 
-## $g\_oauth->refresh\_token($access\_token)
+## refresh\_token($refresh\_token)
 
 For use when you require offline access.
 
@@ -89,7 +89,7 @@ Assuming you are storing the access token in your own storage method,
 the access token returned here should replace the old one stored
 against the user.
 
-## $g\_oauth->revoke\_token($access\_token)
+## revoke\_token($access\_token)
 
 Revokes the access token on Google on behalf of the user.
 
