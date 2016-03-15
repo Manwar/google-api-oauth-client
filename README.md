@@ -96,3 +96,17 @@ Revokes the access token on Google on behalf of the user.
 If successful, it will be as if the user had never given
 consent to your application, so restarting the oauth flow
 will be the necessary.
+
+# AUTHOR
+
+Ali Zia, `<ziali088@gmail.com>`
+
+# REPOSITORY
+
+https://github.com/ziali088/google-api-oauth-client
+
+# COPYRIGHT AND LICENSE
+
+This is free software. You may use it and distribute it under the same terms as Perl itself.
+
+Copyright (C) 2016 - Ali Zia
